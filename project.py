@@ -4,23 +4,22 @@ import openai
 
 openai.api_key = st.secrets["API_KEY"]
 st.title("chatBot : Streamlit + openAI")
-initialized = False
-if not initialized:
-    chathistory = [{"role": "system", "content": "You a helpuful assistant."}]
-    initialized = True
+
+if "chathistory" not in st.session_state:
+    st.session_state.chathistory = [{"role": "system", "content": "You a helpuful assistant."}]
 
 def respond(prompt):
-    chathistory.append({"role": "user", "content": prompt})
+    st.session_state.chathistory.append({"role": "user", "content": prompt})
     ans = openai.ChatCompletion.create(
         model="gpt-3.5-turbo",
-        messages=chathistory,
+        messages=st.session_state.chathistory,
     )
-    chathistory.append({"role": "assistant", "content": ans['choices'][0]['message']['content']})
+    st.session_state.chathistory.append({"role": "assistant", "content": ans['choices'][0]['message']['content']})
     return ans['choices'][0]['message']['content']
 
 user_input = st.text_input("You: ",placeholder='ask anything', key="input")
-message(len(chathistory))
-for item in chathistory:
+message(len(st.session_state.chathistory))
+for item in st.session_state.chathistory:
     if item['role'] == 'user':
         message(item['content'], is_user=True)
     elif item['role'] == 'assistant':
