@@ -25,3 +25,4 @@ for item in chathistory:
         message(item['content'], is_user=False)
 message(user_input, is_user=True)
 message(respond(user_input), is_user=False)
+message(chathistory)
