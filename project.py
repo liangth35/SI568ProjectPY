@@ -1,9 +1,8 @@
 import streamlit as st
 from streamlit_chat import message
-import streamlit.secrets as secrets
 import openai
 
-openai.api_key = secrets["API_KEY"]
+openai.api_key = st.secrets["API_KEY"]
 st.title("chatBot : Streamlit + openAI")
 
 def respond(prompt):
