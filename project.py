@@ -17,7 +17,7 @@ def respond(prompt):
     return ans['choices'][0]['message']['content']
 
 user_input = st.text_input("You: ",placeholder='ask anything', key="input")
-
+message(len(chathistory))
 for item in chathistory:
     if item['role'] == 'user':
         message(item['content'], is_user=True)
@@ -25,4 +25,3 @@ for item in chathistory:
         message(item['content'], is_user=False)
 message(user_input, is_user=True)
 message(respond(user_input), is_user=False)
-message(chathistory)
