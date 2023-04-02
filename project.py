@@ -2,7 +2,7 @@ import streamlit as st
 from streamlit_chat import message
 import openai
 
-openai.api_key = ""
+openai.api_key = ''
 st.title("chatBot : Streamlit + openAI")
 
 def respond(prompt):
