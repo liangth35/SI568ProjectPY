@@ -4,8 +4,10 @@ import openai
 
 openai.api_key = st.secrets["API_KEY"]
 st.title("chatBot : Streamlit + openAI")
-
-chathistory = [{"role": "system", "content": "You a helpuful assistant."}]
+initialized = False
+if not initialized:
+    chathistory = [{"role": "system", "content": "You a helpuful assistant."}]
+    initialized = True
 
 def respond(prompt):
     chathistory.append({"role": "user", "content": prompt})
