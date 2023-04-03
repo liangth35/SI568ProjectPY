@@ -1,8 +1,8 @@
 import streamlit as st
 from streamlit_chat import message
 import openai
-# from audio_recorder_streamlit import audio_recorder
-import whisper
+#from audio_recorder_streamlit import audio_recorder
+# import whisper
 import os
 import numpy as np
 from io import BytesIO
@@ -28,17 +28,19 @@ def clear_history():
     st.session_state.text_input = ''
 
 def send_audio():
-    # if st.session_state.audio_bytes:
-        # if "model" not in st.session_state:
-        #     st.session_state.model = whisper.load_model("base")
-        # result = st.session_state.model.transcribe(np.frombuffer(st.session_state.audio_bytes))
-    audio_file = open("audio.wav", "rb")
+
+    audio_file = open("output.wav", "rb")
+    
     result = openai.Audio.transcribe("whisper-1", audio_file)
-    message(result, is_user=False)
+    # if "model" not in st.session_state:
+    #     st.session_state.model = whisper.load_model("tiny")
+    # result = st.session_state.model.transcribe(st.session_state.audio_bytes.astype(np.float32))['text']
+    message(result, is_user=True)
+
 
 st.session_state.audio_bytes = st_audiorec()
-
-st.button("Send Audio", key="send_audio", on_click=send_audio)
+if st.button("Send Audio", key="send_audio"):
+    send_audio()
 
 
 st.text_input("You: ",placeholder='ask anything', key="text_input")
