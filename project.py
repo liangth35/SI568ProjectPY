@@ -8,9 +8,10 @@ import numpy as np
 from io import BytesIO
 import streamlit.components.v1 as components
 from st_custom_components import st_audiorec
+import wave
 
 openai.api_key = st.secrets["API_KEY"]
-st.title("chatBot : Streamlit + openAI")
+st.title("Audio chatBot")
 
 if "chathistory" not in st.session_state:
     st.session_state.chathistory = [{"role": "system", "content": "You a helpuful assistant."}]
@@ -28,20 +29,36 @@ def clear_history():
     st.session_state.text_input = ''
 
 def send_audio():
+    with wave.open("out.wav", "wb") as output_file:
+        # set the number of audio channels (1 for mono, 2 for stereo)
+        num_channels = 2
+        # set the sample width (in bytes)
+        sample_width = 2
+        # set the frame rate (in Hz)
+        frame_rate = 44100
+        # set the number of frames
+        num_frames = len(st.session_state.audio_bytes) // (num_channels * sample_width)
+        # set the compression type and compression name
+        compression_type = "NONE"
+        compression_name = "not compressed"
+        # set the parameters of the output file
+        output_file.setparams((num_channels, sample_width, frame_rate, num_frames, compression_type, compression_name))
+        # write the audio data to the output file
+        output_file.writeframes(st.session_state.audio_bytes)
 
-    audio_file = open("output.wav", "rb")
-    
+    audio_file = open("out.wav", "rb")
     result = openai.Audio.transcribe("whisper-1", audio_file)
+    
     # if "model" not in st.session_state:
     #     st.session_state.model = whisper.load_model("tiny")
     # result = st.session_state.model.transcribe(st.session_state.audio_bytes.astype(np.float32))['text']
-    message(result, is_user=True)
+
+    respond(result.text)
 
 
 st.session_state.audio_bytes = st_audiorec()
-if st.button("Send Audio", key="send_audio"):
-    send_audio()
 
+st.button("Send Audio", key="send_audio", on_click=send_audio)
 
 st.text_input("You: ",placeholder='ask anything', key="text_input")
 st.button("Clear History", key="clear_button", on_click=clear_history)
