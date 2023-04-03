@@ -1,6 +1,13 @@
 import streamlit as st
 from streamlit_chat import message
 import openai
+# from audio_recorder_streamlit import audio_recorder
+import whisper
+import os
+import numpy as np
+from io import BytesIO
+import streamlit.components.v1 as components
+from st_custom_components import st_audiorec
 
 openai.api_key = st.secrets["API_KEY"]
 st.title("chatBot : Streamlit + openAI")
@@ -15,14 +22,33 @@ def respond(prompt):
         messages=st.session_state.chathistory,
     )
     st.session_state.chathistory.append({"role": "assistant", "content": ans['choices'][0]['message']['content']})
-    return ans['choices'][0]['message']['content']
 
-user_input = st.text_input("You: ",placeholder='ask anything', key="input")
-message(len(st.session_state.chathistory))
-for item in st.session_state.chathistory:
+def clear_history():
+    st.session_state.chathistory = [{"role": "system", "content": "You a helpuful assistant."}]
+    st.session_state.text_input = ''
+
+def send_audio():
+    # if st.session_state.audio_bytes:
+        # if "model" not in st.session_state:
+        #     st.session_state.model = whisper.load_model("base")
+        # result = st.session_state.model.transcribe(np.frombuffer(st.session_state.audio_bytes))
+    audio_file = open("audio.wav", "rb")
+    result = openai.Audio.transcribe("whisper-1", audio_file)
+    message(result, is_user=False)
+
+st.session_state.audio_bytes = st_audiorec()
+
+st.button("Send Audio", key="send_audio", on_click=send_audio)
+
+
+st.text_input("You: ",placeholder='ask anything', key="text_input")
+st.button("Clear History", key="clear_button", on_click=clear_history)
+
+if st.session_state.text_input!='':
+    respond(st.session_state.text_input)
+
+for item in reversed(st.session_state.chathistory):
     if item['role'] == 'user':
         message(item['content'], is_user=True)
     elif item['role'] == 'assistant':
         message(item['content'], is_user=False)
-message(user_input, is_user=True)
-message(respond(user_input), is_user=False)
