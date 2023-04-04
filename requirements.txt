@@ -1,9 +1,5 @@
 streamlit_chat
 openai
-streamlit_webrtc
 audio_recorder_streamlit
 openai-whisper
-numpy
 wave
-os
-io
